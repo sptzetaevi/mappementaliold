@@ -51,9 +51,11 @@
 
     /* SVG: non blocca click su box */
     svg{
-      position:absolute; inset:0;
-      width:100%; height:100%;
-      pointer-events:none;
+    position:absolute; inset:0;
+    width:100%;
+    height:100%;
+    overflow:visible;
+    pointer-events:auto; /* così le linee possono anche essere cliccate */
     }
 
     .pop{
