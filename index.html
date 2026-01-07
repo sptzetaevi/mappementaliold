@@ -43,11 +43,26 @@
 
     #board{
       position:relative; overflow:hidden;
+      touch-action: none;
       background:
         linear-gradient(var(--bg), var(--bg)),
         repeating-linear-gradient(0deg, transparent, transparent 23px, var(--grid) 24px),
         repeating-linear-gradient(90deg, transparent, transparent 23px, var(--grid) 24px);
     }
+    #viewport{
+  position:absolute;
+  left:0; top:0;
+  width:8000px;
+  height:8000px;
+  transform-origin: 0 0;
+}
+
+#world{
+  position:absolute;
+  left:0; top:0;
+  width:100%;
+  height:100%;
+}
 
     /* SVG: non blocca click su box */
     svg{
@@ -198,9 +213,12 @@
   </header>
 
   <div id="board">
+  <div id="viewport">
     <svg id="wires"></svg>
-    <div class="ghost">Doppio click sullo sfondo per creare un pop</div>
+    <div id="world"></div>
   </div>
+
+  <div class="ghost">Doppio click sullo sfondo per creare un pop</div>
 </div>
 
 <script>
@@ -208,6 +226,8 @@
   // ---------- elementi ----------
   var board = document.getElementById("board");
   var svg = document.getElementById("wires");
+  var viewport = document.getElementById("viewport");
+  var world = document.getElementById("world");
   var statusEl = document.getElementById("status");
 
   var btnNew = document.getElementById("btnNew");
@@ -231,6 +251,131 @@
   var selectedLinkId = null;
   var linkingFrom = null;
   var moveMode = false;
+  // ---------- PAN + ZOOM (mobile + desktop) ----------
+var view = { x: 0, y: 0, s: 1 };
+
+function clampScale(s){
+  return Math.max(0.35, Math.min(2.8, s));
+}
+
+function applyView(){
+  viewport.style.transform = "translate(" + view.x + "px," + view.y + "px) scale(" + view.s + ")";
+}
+
+function screenToWorld(clientX, clientY){
+  var br = board.getBoundingClientRect();
+  var sx = clientX - br.left;
+  var sy = clientY - br.top;
+  return { x: (sx - view.x)/view.s, y: (sy - view.y)/view.s };
+}
+
+applyView();
+
+// Pointer tracking
+var pointers = new Map();
+var panState = null;
+var pinchState = null;
+
+function dist(a,b){
+  var dx=a.x-b.x, dy=a.y-b.y;
+  return Math.hypot(dx,dy);
+}
+
+board.addEventListener("pointerdown", function(e){
+  // se tocchi un box, lascia gestire il drag del box (che fa stopPropagation)
+  if (e.target.closest(".pop")) return;
+
+  board.setPointerCapture(e.pointerId);
+  pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+
+  if (pointers.size === 1){
+    panState = { startX:view.x, startY:view.y, p0:{x:e.clientX,y:e.clientY} };
+    pinchState = null;
+  }
+
+  if (pointers.size === 2){
+    var arr = Array.from(pointers.values());
+    var pA = arr[0], pB = arr[1];
+    var mid = { x:(pA.x+pB.x)/2, y:(pA.y+pB.y)/2 };
+    var wMid = screenToWorld(mid.x, mid.y);
+
+    pinchState = {
+      startS: view.s,
+      startD: dist(pA,pB),
+      midScreen: mid,
+      midWorld: wMid
+    };
+    panState = null;
+  }
+});
+
+board.addEventListener("pointermove", function(e){
+  if (!pointers.has(e.pointerId)) return;
+  pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+
+  // pinch
+  if (pinchState && pointers.size >= 2){
+    var arr = Array.from(pointers.values());
+    var pA = arr[0], pB = arr[1];
+    var d = dist(pA,pB);
+    view.s = clampScale(pinchState.startS * (d / pinchState.startD));
+
+    // mantieni fisso il punto sotto alle dita
+    var br = board.getBoundingClientRect();
+    var midSx = pinchState.midScreen.x - br.left;
+    var midSy = pinchState.midScreen.y - br.top;
+
+    view.x = midSx - pinchState.midWorld.x * view.s;
+    view.y = midSy - pinchState.midWorld.y * view.s;
+
+    applyView();
+    renderLinks();
+    return;
+  }
+
+  // pan
+  if (panState && pointers.size === 1){
+    view.x = panState.startX + (e.clientX - panState.p0.x);
+    view.y = panState.startY + (e.clientY - panState.p0.y);
+    applyView();
+    renderLinks();
+  }
+});
+
+board.addEventListener("pointerup", function(e){
+  pointers.delete(e.pointerId);
+  if (pointers.size === 0){
+    panState = null;
+    pinchState = null;
+  }
+});
+
+board.addEventListener("pointercancel", function(){
+  pointers.clear();
+  panState = null;
+  pinchState = null;
+});
+
+// zoom con CTRL + rotellina (desktop)
+board.addEventListener("wheel", function(e){
+  if (!e.ctrlKey) return;
+  e.preventDefault();
+
+  var before = screenToWorld(e.clientX, e.clientY);
+  var factor = (e.deltaY < 0) ? 1.08 : 0.92;
+  view.s = clampScale(view.s * factor);
+
+  var br = board.getBoundingClientRect();
+  var sx = e.clientX - br.left;
+  var sy = e.clientY - br.top;
+
+  view.x = sx - before.x * view.s;
+  view.y = sy - before.y * view.s;
+
+  applyView();
+  renderLinks();
+}, { passive:false });
+
     // --- opzioni collegamento (scelte al momento dell'attivazione di "Collega") ---
   var linkPreset = { end: "arrow", shape: "straight" }; // default
   var linkModal = null;
@@ -307,15 +452,10 @@
   }
 
   function clampToBoard(x, y) {
-    var r = boardRect();
-    var maxX = r.width - 260;
-    var maxY = r.height - 160;
-    if (x < 8) x = 8;
-    if (y < 8) y = 8;
-    if (x > maxX) x = maxX;
-    if (y > maxY) y = maxY;
-    return { x:x, y:y };
-  }
+  if (x < 0) x = 0;
+  if (y < 0) y = 0;
+  return { x:x, y:y };
+}
 
   function clearSelections() {
     selectedBoxId = null;
@@ -439,17 +579,20 @@
   }
 
   function getPopBoxInBoardCoords(id) {
-    var el = document.querySelector('.pop[data-id="'+id+'"]');
-    if (!el) return null;
-    var r = el.getBoundingClientRect();
-    var br = boardRect();
-    var x = r.left - br.left;
-    var y = r.top  - br.top;
-    return {
-      cx: x + r.width/2, cy: y + r.height/2,
-      hw: r.width/2, hh: r.height/2
-    };
-  }
+  var el = document.querySelector('.pop[data-id="'+id+'"]');
+  if (!el) return null;
+
+  // offsetLeft/Top sono in coordinate "mondo" (NON influenzate da transform)
+  var x = el.offsetLeft;
+  var y = el.offsetTop;
+  var w = el.offsetWidth;
+  var h = el.offsetHeight;
+
+  return {
+    cx: x + w/2, cy: y + h/2,
+    hw: w/2, hh: h/2
+  };
+}
 
   function edgePoint(cx, cy, hw, hh, dx, dy) {
     if (dx === 0 && dy === 0) return { x: cx, y: cy };
@@ -543,7 +686,7 @@
   }
 
   function render() {
-    var old = board.querySelectorAll(".pop");
+    var old = world.querySelectorAll(".pop");
     for (var i=0;i<old.length;i++) old[i].remove();
 
     var ghost = board.querySelector(".ghost");
@@ -611,8 +754,8 @@
 
          function onMove(ev) {
            if (!dragging) return;
-           var dx = ev.clientX - sx;
-           var dy = ev.clientY - sy;
+           var dx = (ev.clientX - sx) / view.s;
+           var dy = (ev.clientY - sy) / view.s;
            var pos = clampToBoard(ox + dx, oy + dy);
            p.x = pos.x; p.y = pos.y;
            el.style.left = p.x + "px";
@@ -630,7 +773,7 @@
           window.addEventListener("pointerup", onUp, { passive:true });
 });
 
-      board.appendChild(el);
+      world.appendChild(el);
     });
 
     renderLinks();
@@ -745,8 +888,8 @@ function parseImportedText(text) {
 
   board.addEventListener("dblclick", function (e) {
     if (e.target && e.target.closest && e.target.closest(".pop")) return;
-    var br = boardRect();
-    var pos = clampToBoard(e.clientX - br.left, e.clientY - br.top);
+    var p = screenToWorld(e.clientX, e.clientY);
+    var pos = clampToBoard(p.x, p.y);
     createPop(pos.x, pos.y);
   });
 
