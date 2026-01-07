@@ -115,10 +115,30 @@
     }
 
     @media print {
-      header { display:none !important; }
-      #board { background:#fff !important; overflow:visible !important; }
-      .ghost { display:none !important; }
-    }
+  header { display:none !important; }
+  .ghost { display:none !important; }
+
+  /* Mantieni un'altezza reale al layout in stampa */
+  html, body { height: 100% !important; }
+  #app { height: 100% !important; }
+
+  /* Il board deve avere dimensioni stampabili */
+  #board {
+    background:#fff !important;
+    overflow: visible !important;
+    height: 100vh !important;   /* <-- CHIAVE: altrimenti svg=0 */
+  }
+
+  /* SVG deve occupare tutto il board in stampa */
+  #wires {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  svg {
+    overflow: visible !important;
+  }
+}
 
    #mapTitle {
      margin-left: auto;   /* lo spinge a destra nel header */
