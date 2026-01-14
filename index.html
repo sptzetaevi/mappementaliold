@@ -784,20 +784,42 @@
     }
   }
   
-  /* Cresce ma non si restringe */
   function autoGrow(ta, popModel) {
-    ta.style.height = "auto";
-    var needed = ta.scrollHeight;
-    if (popModel) {
-      if (!popModel.height || needed > popModel.height) {
-        popModel.height = needed;
-      }
-      ta.style.height = popModel.height + "px";
-    } else {
-      ta.style.height = needed + "px";
-    }
+  // reset per calcolare bene lo scrollHeight
+  ta.style.height = "auto";
+
+  // calcolo dell'altezza di UNA riga
+  var computed = window.getComputedStyle(ta);
+  var lineH = parseFloat(computed.lineHeight);
+  if (isNaN(lineH)) {
+    lineH = parseFloat(computed.fontSize) * 1.25 || 18; // fallback
   }
 
+  var txt = ta.value || "";
+  var needed;
+
+  if (!txt.trim()) {
+    // POP vuoto
+    if (popModel && popModel.bigIntro) {
+      // solo il PRIMO pop può nascere a 4 righe
+      needed = lineH * 4;
+    } else {
+      // tutti gli altri (e il primo dopo l’uso) = una riga sola
+      needed = lineH;
+    }
+  } else {
+    // c'è testo → altezza minima che permette di leggere tutto
+    needed = ta.scrollHeight;
+    if (needed < lineH) needed = lineH;
+  }
+
+  if (popModel) {
+    popModel.height = needed;
+  }
+
+  ta.style.height = needed + "px";
+}
+  
   function resizeSelectedTextarea() {
     if (!selectedBoxId) return;
     var p = pops.find(function(pp){ return pp.id === selectedBoxId; });
@@ -807,49 +829,25 @@
   }
 
     function createPop(x, y) {
-    // È il primo POP della mappa mentale?
-    var isFirst = (pops.length === 0);
+  // è il primo POP della mappa?
+  var isFirst = (pops.length === 0);
 
-    if (isFirst) {
-      // Ignora le coordinate passate e centra il primo box nell'area di lavoro
-      var br = boardRect();
-      var centerScreenX = br.left + br.width  / 2;
-      var centerScreenY = br.top  + br.height / 2;
+  var p = {
+    id: uid(),
+    x: x,
+    y: y,
+    text: "",
+    color: "#000000",
+    size: "small",
+    bold: false,
+    height: 0,
+    bigIntro: isFirst   // solo il primo POP nasce più alto
+  };
 
-      var w = screenToWorld(centerScreenX, centerScreenY);
-      var pos = clampToBoard(w.x, w.y);
-
-      x = pos.x;
-      y = pos.y;
-    }
-
-    var p = {
-      id: uid(),
-      x: x,
-      y: y,
-      text: "",
-      color: "#000000",
-      size: "small",
-      bold: false,
-      height: 0
-    };
-
-    pops.push(p);
-    render();
-    selectBox(p.id);
-
-    // metto subito il focus nel nuovo box
-    var ta = document.querySelector('.pop[data-id="' + p.id + '"] .body');
-    if (ta) ta.focus();
-
-    // messaggi diversi nello status
-    if (isFirst) {
-      setStatus("Inserisci qui l'argomento della mappa.");
-    } else {
-      setStatus("Suggerimento: scrivi cosa ti viene in mente collegato a questo argomento.");
-    }
-  }
-
+  pops.push(p);
+  render();
+  selectBox(p.id);
+}
 
   function addLink(from, to, preset) {
     if (!from || !to || from === to) return;
