@@ -784,41 +784,39 @@
     }
   }
   
-  function autoGrow(ta, popModel) {
-  // reset per calcolare bene lo scrollHeight
-  ta.style.height = "auto";
+    function autoGrow(ta, popModel) {
+    // reset per calcolare bene lo scrollHeight
+    ta.style.height = "auto";
 
-  // calcolo dell'altezza di UNA riga
-  var computed = window.getComputedStyle(ta);
-  var lineH = parseFloat(computed.lineHeight);
-  if (isNaN(lineH)) {
-    lineH = parseFloat(computed.fontSize) * 1.25 || 18; // fallback
-  }
-
-  var txt = ta.value || "";
-  var needed;
-
-  if (!txt.trim()) {
-    // POP vuoto
-    if (popModel && popModel.bigIntro) {
-      // solo il PRIMO pop può nascere a 4 righe
-      needed = lineH * 4;
-    } else {
-      // tutti gli altri (e il primo dopo l’uso) = una riga sola
-      needed = lineH;
+    // calcolo dell'altezza di UNA riga
+    var computed = window.getComputedStyle(ta);
+    var lineH = parseFloat(computed.lineHeight);
+    if (isNaN(lineH)) {
+      lineH = parseFloat(computed.fontSize) * 1.25 || 18; // fallback
     }
-  } else {
-    // c'è testo → altezza minima che permette di leggere tutto
-    needed = ta.scrollHeight;
-    if (needed < lineH) needed = lineH;
-  }
 
-  if (popModel) {
-    popModel.height = needed;
-  }
+    var txt = ta.value || "";
+    var needed;
 
-  ta.style.height = needed + "px";
-}
+    if (!txt.trim()) {
+      // POP vuoto → una sola riga (o 4 se un giorno userai bigIntro)
+      if (popModel && popModel.bigIntro) {
+        needed = lineH * 4;
+      } else {
+        needed = lineH;
+      }
+    } else {
+      // c'è testo → altezza minima che permette di leggere tutto
+      needed = ta.scrollHeight;
+      if (needed < lineH) needed = lineH;
+    }
+
+    if (popModel) {
+      popModel.height = needed;
+    }
+
+    ta.style.height = needed + "px";
+  }
   
   function resizeSelectedTextarea() {
     if (!selectedBoxId) return;
