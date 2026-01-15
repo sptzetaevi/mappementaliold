@@ -124,23 +124,30 @@
 
      .pop{
       position:absolute;
-      min-width:5ch;      /* come nel file 32: si stringe ma non troppo */
+
+      /* 👉 niente width fissa */
+      min-width:3ch;          /* prova 3ch; se ti sembra troppo stretto, metti 4–5ch */
       max-width:48ch;
-      width:fit-content; 
+
       background:#fff;
       border:1px solid rgba(0,0,0,.55);
       border-radius:14px;
       box-shadow:0 8px 24px rgba(0,0,0,.10);
-      padding:10px;
+      padding:8px;            /* leggermente più contenuto anche il padding orizzontale */
       box-sizing:border-box;
       user-select:none;
       cursor:grab;
-      display:flex;
+
+      /* 👉 inline-flex = il box si adatta alla larghezza del contenuto,
+         invece di occupare più spazio del necessario */
+      display:inline-flex;
       align-items:center;
       justify-content:center;
-      touch-action: none;
+
+      touch-action:none;
       pointer-events:auto;
-     }
+}
+
     .pop:active{ cursor:grabbing; }
     .pop.selected{ outline:3px solid rgba(0,120,255,.25); }
     .pop.linking{ background:rgba(0,120,255,.08)!important; border-color:rgba(0,120,255,.35)!important; }
