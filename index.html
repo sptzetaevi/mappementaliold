@@ -1080,7 +1080,8 @@
       }
 
       el.innerHTML =
-        '<textarea class="body" spellcheck="false" rows="1"' + placeholderAttr + '></textarea>';
+        '<textarea class="body" spellcheck="false" rows="1" cols="6"' + placeholderAttr + '></textarea>';
+
       var ta = el.querySelector(".body");
       ta.value = p.text || "";
 
