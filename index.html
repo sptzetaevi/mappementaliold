@@ -126,8 +126,8 @@
       position:absolute;
 
       /* 👉 niente width fissa */
-      min-width:3ch;          /* prova 3ch; se ti sembra troppo stretto, metti 4–5ch */
-      max-width:48ch;
+      min-width:5ch;          /* prova 3ch; se ti sembra troppo stretto, metti 4–5ch */
+      max-width:none;
 
       background:#fff;
       border:1px solid rgba(0,0,0,.55);
@@ -147,6 +147,10 @@
       touch-action:none;
       pointer-events:auto;
 }
+    .pop:focus-within{
+  /* quando il textarea interno è in focus, il box si allarga a 20 "battute" */
+  min-width:20ch;
+}
 
     .pop:active{ cursor:grabbing; }
     .pop.selected{ outline:3px solid rgba(0,120,255,.25); }
@@ -156,7 +160,7 @@
   /* 👉 lascia decidere alla textarea quanto essere larga,
      senza forzarla a riempire il box */
   width:auto;
-  max-width:100%;
+  max-width:20ch;
 
   border:0;
   outline:0;
@@ -832,29 +836,6 @@
 
    ta.style.height = needed + "px";
  }
-
-    function createPop(x, y) {
-    // è il primo POP della mappa?
-    var isFirst = (pops.length === 0);
-
-    var p = {
-      id: uid(),
-      x: x,
-      y: y,
-      text: "",
-      height: 0,
-      bigIntro: isFirst   // solo il primo POP nasce a 4 righe
-    };
-
-    pops.push(p);
-    render();
-
-    // 👉 MOSTRA IL SUGGERIMENTO SOLO QUANDO SI CREA UN NUOVO POP
-    setStatus("Suggerimento: scrivi un concetto chiave senza articoli o aggettivi (es. SI: Napoleone — NO: il grande Napoleone).");
-    selectBox(p.id);
-    var el = document.querySelector('[data-id="' + p.id + '"] .body');
-    if (el) el.focus();
-}
   
   function resizeSelectedTextarea() {
     if (!selectedBoxId) return;
@@ -877,12 +858,23 @@
     size: "small",
     bold: false,
     height: 0,
-    bigIntro: isFirst   // solo il primo POP nasce più alto
+    bigIntro: isFirst   // solo il primo POP nasce più alto (autoGrow gestisce)
   };
 
   pops.push(p);
   render();
+
+  // seleziona il nuovo box
   selectBox(p.id);
+
+  // messaggio di suggerimento
+  setStatus(
+    "Suggerimento: scrivi un concetto chiave senza articoli o aggettivi (es. SI: Napoleone — NO: il grande Napoleone)."
+  );
+
+  // porta subito il focus sulla textarea del nuovo POP
+  var el = document.querySelector('.pop[data-id="' + p.id + '"] .body');
+  if (el) el.focus();
 }
 
   function addLink(from, to, preset) {
