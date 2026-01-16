@@ -27,12 +27,26 @@
       align-items:center;
       padding:10px 12px;
     }
+
+    /* Maniglia-cassetto ingrandita con frecce */
     .headerHandle{
       width:100%;
-      height:8px;
-      background:rgba(0,0,0,.20);
+      height:20px;                       /* più alta */
+      background:rgba(0,0,0,.18);        /* un po' più visibile */
       cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
     }
+    .headerHandle::before{
+      content:"▲ ▼";                     /* frecce su/giù */
+      font-size:11px;
+      letter-spacing:3px;
+      color:#f5f5f5;
+      opacity:0.9;
+    }
+
     header.collapsed .headerInner{
       display:none;
     }
@@ -122,64 +136,53 @@
       pointer-events:auto;
     }
 
-     .pop{
+    .pop{
       position:absolute;
-
-      /* 👉 niente width fissa */
-      min-width:20ch;      /* allarga a ~20 caratteri */
-      max-width:32ch;      /* limite massimo */
-
+      min-width:20ch;
+      max-width:32ch;
       background:#fff;
       border:1px solid rgba(0,0,0,.55);
       border-radius:14px;
       box-shadow:0 8px 24px rgba(0,0,0,.10);
-      padding:6px;            /* leggermente più contenuto anche il padding orizzontale */
+      padding:6px;
       box-sizing:border-box;
       user-select:none;
       cursor:grab;
-
-      /* 👉 inline-flex = il box si adatta alla larghezza del contenuto,
-         invece di occupare più spazio del necessario */
       display:inline-flex;
       align-items:center;
       justify-content:center;
-
       touch-action:none;
       pointer-events:auto;
-}
+    }
+
     .pop:focus-within{
-  /* quando il textarea interno è in focus, il box si allarga a 20 "battute" */
-  min-width:20ch;
-}
+      min-width:20ch;
+    }
 
     .pop:active{ cursor:grabbing; }
     .pop.selected{ outline:3px solid rgba(0,120,255,.25); }
     .pop.linking{ background:rgba(0,120,255,.08)!important; border-color:rgba(0,120,255,.35)!important; }
 
     .body{
-  /* 👉 lascia decidere alla textarea quanto essere larga,
-     senza forzarla a riempire il box */
-  width:100%;       /* prende tutta la larghezza del POP */
-  max-width:none;   /* nessun limite interno */
+      width:100%;
+      max-width:none;
+      border:0;
+      outline:0;
+      resize:none;
+      overflow-y:auto;
+      background:transparent;
+      color:inherit;
+      font-size:14px;
+      line-height:1.25;
+      padding:0;
+      margin:0;
+      box-sizing:border-box;
+      min-height:1.25em;
+      white-space:pre-wrap;
+      word-break:normal;
+      text-align:center;
+    }
 
-  border:0;
-  outline:0;
-  resize:none;
-  overflow-y:auto;
-  background:transparent;
-  color:inherit;
-  font-size:14px;
-  line-height:1.25;
-  padding:0;
-  margin:0;
-  box-sizing:border-box;
-  min-height:1.25em;
-  white-space:pre-wrap;
-  word-break:normal;
-  text-align:center;
-}
-
-        /* stile del placeholder dentro il POP */
     .body::placeholder{
       color:rgba(0,0,0,.45);
       font-size:12px;
@@ -202,6 +205,64 @@
       position:absolute; inset:0; pointer-events:none;
       display:flex; align-items:center; justify-content:center;
       font-size:14px; opacity:.55;
+    }
+
+    /* Controlli flottanti in basso a destra/sinistra */
+    #controlsRight {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 999;
+    }
+
+    #controlsLeft {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 999;
+    }
+
+    #controlsRight .btn,
+    #controlsLeft .btn {
+      pointer-events: auto;
+    }
+
+    /* Ingrandisco i pulsanti flottanti +, - e ✋ */
+    #controlsRight .btn.tiny {
+      padding: 8px 12px;
+      font-size: 15px;
+      border-radius: 12px;
+      min-width: 40px;
+    }
+
+    /* Pan flottante ben visibile quando attivo */
+    #btnPan_f.active {
+      background: rgba(0,120,255,.12);
+      border-color: rgba(0,120,255,.8);
+      box-shadow: 0 0 0 3px rgba(0,120,255,.25);
+    }
+
+    /* Sposta flottante ben visibile quando attivo */
+    #btnMove_f.active {
+      background: rgba(0,120,255,.12);
+      border-color: rgba(0,120,255,.8);
+      box-shadow: 0 0 0 3px rgba(0,120,255,.25);
+    }
+
+    /* Nascondo i bottoni originali nel header,
+       ma li tengo nel DOM per riusare tutta la logica JS */
+    #btnZoomIn,
+    #btnZoomOut,
+    #btnPan,
+    #btnMove,
+    #btnLink {
+      display: none !important;
     }
 
     @media print {
@@ -282,6 +343,28 @@
     .modal .row{ display:flex; gap:12px; flex-wrap:wrap; margin:10px 0; }
     .modal label{ display:flex; gap:8px; align-items:center; font-size:14px; cursor:pointer; }
     .modal .actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:12px; }
+    /* Layout speciale su smartphone quando la tastiera è aperta */
+@media (max-width: 768px) {
+  body.kb-open header {
+    display: none;  /* nasconde l'header per recuperare spazio */
+  }
+
+  body.kb-open #controlsLeft,
+  body.kb-open #controlsRight {
+    position: fixed;      /* non più relativi al board, ma alla finestra */
+    top: 8px;
+    z-index: 9999;
+  }
+
+  body.kb-open #controlsLeft {
+    left: 8px;
+  }
+
+  body.kb-open #controlsRight {
+    right: 8px;
+  }
+}
+
   </style>
 </head>
 
@@ -352,6 +435,20 @@
     </div>
   </div>
 
+  <!-- Nuovi controlli flottanti -->
+  <div id="controlsLeft">
+    <button class="btn" id="btnMove_f">Sposta</button>
+    <button class="btn" id="btnLink_f">Collega</button>
+  </div>
+
+  <div id="controlsRight">
+    <button class="btn tiny" id="btnZoomIn_f">+</button>
+    <button class="btn tiny" id="btnZoomOut_f">-</button>
+    <button class="btn tiny" id="btnPan_f" title="Pan vista">✋</button>
+  </div>
+
+</div>
+
 <script>
 (function () {
   var board = document.getElementById("board");
@@ -386,6 +483,14 @@
   var fileInput = document.getElementById("fileInput");
   var btnZoomIn = document.getElementById("btnZoomIn");
   var btnZoomOut = document.getElementById("btnZoomOut");
+
+  // bottoni flottanti in basso
+  var btnZoomIn_f  = document.getElementById("btnZoomIn_f");
+  var btnZoomOut_f = document.getElementById("btnZoomOut_f");
+  var btnPan_f     = document.getElementById("btnPan_f");
+
+  var btnMove_f    = document.getElementById("btnMove_f");
+  var btnLink_f    = document.getElementById("btnLink_f");
 
   var txtColor = document.getElementById("txtColor");
   var btnSizeSmall = document.getElementById("btnSizeSmall");
@@ -745,9 +850,11 @@
     panMode = !!on;
     if (panMode){
       btnPan.classList.add("active");
+      if (btnPan_f) btnPan_f.classList.add("active");
       setStatus("Modalità Pan: trascina lo sfondo per spostarti.");
     } else {
       btnPan.classList.remove("active");
+      if (btnPan_f) btnPan_f.classList.remove("active");
       setStatus("Pronto");
     }
   }
@@ -789,9 +896,11 @@
       setLinkMode(false);
       setPanMode(false);
       btnMove.classList.add("active");
+      if (btnMove_f) btnMove_f.classList.add("active");
       setStatus("Modalita sposta: trascina i box.");
     } else {
       btnMove.classList.remove("active");
+      if (btnMove_f) btnMove_f.classList.remove("active");
       setStatus("Pronto");
     }
 
@@ -801,41 +910,35 @@
     }
   }
   
-    function autoGrow(ta, popModel) {
-   // reset per calcolare bene lo scrollHeight
-   ta.style.height = "auto";
+  function autoGrow(ta, popModel) {
+    ta.style.height = "auto";
 
-   // calcolo dell'altezza di UNA riga
-   var computed = window.getComputedStyle(ta);
-   var lineH = parseFloat(computed.lineHeight);
-   if (isNaN(lineH)) {
-     lineH = parseFloat(computed.fontSize) * 1.25 || 18; // fallback
-   }
+    var computed = window.getComputedStyle(ta);
+    var lineH = parseFloat(computed.lineHeight);
+    if (isNaN(lineH)) {
+      lineH = parseFloat(computed.fontSize) * 1.25 || 18;
+    }
 
-   var txt = ta.value || "";
-   var needed;
+    var txt = ta.value || "";
+    var needed;
 
-   if (!txt.trim()) {
-    // POP vuoto
-    if (popModel && popModel.bigIntro) {
-      // solo il PRIMO pop può nascere a 4 righe
-      needed = lineH * 4;
-     } else {
-       // tutti gli altri (e il primo dopo l’uso) = una riga sola
-       needed = lineH;
-     }
-   } else {
-     // c'è testo → altezza minima che permette di leggere tutto
-     needed = ta.scrollHeight;
-     if (needed < lineH) needed = lineH;
-   }
+    if (!txt.trim()) {
+      if (popModel && popModel.bigIntro) {
+        needed = lineH * 4;
+      } else {
+        needed = lineH;
+      }
+    } else {
+      needed = ta.scrollHeight;
+      if (needed < lineH) needed = lineH;
+    }
 
-   if (popModel) {
-     popModel.height = needed;
-   }
+    if (popModel) {
+      popModel.height = needed;
+    }
 
-   ta.style.height = needed + "px";
- }
+    ta.style.height = needed + "px";
+  }
   
   function resizeSelectedTextarea() {
     if (!selectedBoxId) return;
@@ -845,37 +948,55 @@
     if (ta) autoGrow(ta, p);
   }
 
-    function createPop(x, y) {
-  // è il primo POP della mappa?
-  var isFirst = (pops.length === 0);
+  function createPop(x, y) {
+    var isFirst = (pops.length === 0);
 
-  var p = {
-    id: uid(),
-    x: x,
-    y: y,
-    text: "",
-    color: "#000000",
-    size: "small",
-    bold: false,
-    height: 0,
-    bigIntro: isFirst   // solo il primo POP nasce più alto (autoGrow gestisce)
-  };
+    var p = {
+      id: uid(),
+      x: x,
+      y: y,
+      text: "",
+      color: "#000000",
+      size: "small",
+      bold: false,
+      height: 0,
+      bigIntro: isFirst
+    };
 
-  pops.push(p);
-  render();
+    pops.push(p);
+    render();
 
-  // seleziona il nuovo box
-  selectBox(p.id);
+    selectBox(p.id);
 
-  // messaggio di suggerimento
-  setStatus(
-    "Suggerimento: scrivi un concetto chiave senza articoli o aggettivi (es. SI: Napoleone — NO: il grande Napoleone)."
-  );
+    setStatus(
+      "Suggerimento: scrivi un concetto chiave senza articoli o aggettivi (es. SI: Napoleone — NO: il grande Napoleone)."
+    );
 
-  // porta subito il focus sulla textarea del nuovo POP
-  var el = document.querySelector('.pop[data-id="' + p.id + '"] .body');
-  if (el) el.focus();
-}
+    var el = document.querySelector('.pop[data-id="' + p.id + '"] .body');
+    if (el) el.focus();
+  }
+
+    // --- Gestione spazio su smartphone quando è aperta la tastiera ---
+  function updateKeyboardClass() {
+    // Se l'elemento attivo è una textarea di un pop, consideriamo la tastiera "aperta"
+    var ae = document.activeElement;
+    var isPopTextarea = ae && ae.classList && ae.classList.contains("body");
+
+    if (isPopTextarea) {
+      document.body.classList.add("kb-open");
+      // Collasso anche il cassetto per recuperare spazio
+      headerCollapsed = true;
+      header.classList.add("collapsed");
+    } else {
+      document.body.classList.remove("kb-open");
+    }
+  }
+
+  document.addEventListener("focusin", updateKeyboardClass);
+  document.addEventListener("focusout", function() {
+    // piccolo ritardo per permettere ad un altro elemento di andare in focus
+    setTimeout(updateKeyboardClass, 50);
+  });
 
   function addLink(from, to, preset) {
     if (!from || !to || from === to) return;
@@ -1045,7 +1166,7 @@
     });
   }
 
-    function render() {
+  function render() {
     var old = world.querySelectorAll(".pop");
     for (var i=0;i<old.length;i++) old[i].remove();
 
@@ -1065,7 +1186,6 @@
 
       el.style.borderColor = p.color || "#000000";
 
-      // SOLO il primo POP ha il placeholder "argomento della mappa"
       var placeholderAttr = "";
       if (idx === 0) {
         placeholderAttr = ' placeholder="Inserisci qui l&#39;argomento della mappa"';
@@ -1286,6 +1406,37 @@
   btnZoomIn.addEventListener("click", function(){ zoomAroundCenter(1.15); });
   btnZoomOut.addEventListener("click", function(){ zoomAroundCenter(1/1.15); });
 
+  // Collego i pulsanti flottanti alle stesse azioni dei bottoni originali
+  if (btnZoomIn_f) {
+    btnZoomIn_f.addEventListener("click", function(){
+      btnZoomIn.click();
+    });
+  }
+
+  if (btnZoomOut_f) {
+    btnZoomOut_f.addEventListener("click", function(){
+      btnZoomOut.click();
+    });
+  }
+
+  if (btnPan_f) {
+    btnPan_f.addEventListener("click", function(){
+      btnPan.click();
+    });
+  }
+
+  if (btnMove_f) {
+    btnMove_f.addEventListener("click", function(){
+      btnMove.click();
+    });
+  }
+
+  if (btnLink_f) {
+    btnLink_f.addEventListener("click", function(){
+      btnLink.click();
+    });
+  }
+
   txtColor.addEventListener("input", function(){
     if (!selectedBoxId) return;
     var p = pops.find(function(pp){ return pp.id === selectedBoxId; });
@@ -1358,7 +1509,6 @@
     });
   });
 
-  /* Apertura/chiusura box "Comandi da tastiera" */
   btnKeyboardHelp.addEventListener("click", function(){
     kbdOverlay.style.display = "flex";
   });
