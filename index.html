@@ -363,6 +363,33 @@
     .saveSplit .btn.saveBottom{
       border-radius:0 0 10px 10px;
     }
+
+    /* Layout speciale su smartphone quando la tastiera è aperta */
+    @media (max-width: 768px) {
+      body.kb-open header {
+        display: none;
+      }
+
+      body.kb-open #controlsLeft,
+      body.kb-open #controlsRight {
+        position: fixed;
+        top: 8px;
+        z-index: 9999;
+      }
+
+      body.kb-open #controlsLeft {
+        left: 8px;
+      }
+
+      body.kb-open #controlsRight {
+        right: 8px;
+      }
+
+      body.kb-open #controlsRight .btn.tiny {
+        padding:6px 10px;
+        font-size:13px;
+      }
+    }
   </style>
 </head>
 
@@ -1016,7 +1043,7 @@
     selectBox(p.id);
 
     setStatus(
-      "Suggerimento: scrivi un concetto chiave senza articoli o aggettivi (es. SI: Napoleone — NO: il grande Napoleone)."
+      "Suggerimento: scrivi quello che ti viene in mente quando pensi all'argomento principale di questa mappa. Collega poi il riquadro con il tuo argomento principale."
     );
 
     var el = document.querySelector('.pop[data-id="' + p.id + '"] .body');
@@ -1448,34 +1475,39 @@
   btnZoomIn.addEventListener("click", function(){ zoomAroundCenter(1.15); });
   btnZoomOut.addEventListener("click", function(){ zoomAroundCenter(1/1.15); });
 
-  // Collego i pulsanti flottanti alle stesse azioni dei bottoni originali
+  // --- Collego i pulsanti flottanti alle funzioni interne ---
   if (btnZoomIn_f) {
     btnZoomIn_f.addEventListener("click", function(){
-      btnZoomIn.click();
+      zoomAroundCenter(1.15);
     });
   }
 
   if (btnZoomOut_f) {
     btnZoomOut_f.addEventListener("click", function(){
-      btnZoomOut.click();
+      zoomAroundCenter(1/1.15);
     });
   }
 
   if (btnPan_f) {
     btnPan_f.addEventListener("click", function(){
-      btnPan.click();
+      var newOn = !panMode;
+      if (newOn) {
+        setMoveMode(false);
+        setLinkMode(false);
+      }
+      setPanMode(newOn);
     });
   }
 
   if (btnMove_f) {
     btnMove_f.addEventListener("click", function(){
-      btnMove.click();
+      setMoveMode(!moveMode);
     });
   }
 
   if (btnLink_f) {
     btnLink_f.addEventListener("click", function(){
-      btnLink.click();
+      setLinkMode(!linkingFrom);
     });
   }
 
@@ -1648,6 +1680,25 @@
       }
     });
   }
+
+  // --- Gestione spazio su smartphone quando è aperta la tastiera ---
+  function updateKeyboardClass() {
+    var ae = document.activeElement;
+    var isPopTextarea = ae && ae.classList && ae.classList.contains("body");
+
+    if (isPopTextarea) {
+      document.body.classList.add("kb-open");
+      headerCollapsed = true;
+      header.classList.add("collapsed");
+    } else {
+      document.body.classList.remove("kb-open");
+    }
+  }
+
+  document.addEventListener("focusin", updateKeyboardClass);
+  document.addEventListener("focusout", function() {
+    setTimeout(updateKeyboardClass, 50);
+  });
 
   render();
   setStatus("Pronto");
