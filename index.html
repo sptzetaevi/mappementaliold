@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>m_mentale</title>
+  <title>m_mentale_57</title>
   <style>
     :root {
       --bg:#f6f7fb;
@@ -26,18 +26,26 @@
       box-sizing:border-box;
     }
     .headerInner{
-      display:flex;
       gap:10px;
+      display:flex;
       flex-wrap:wrap;
       align-items:center;
       padding:10px 12px;
     }
 
+    /* Pulsanti a destra nell'header */
+    .rightButtons{
+      margin-left:auto;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
     /* Maniglia-cassetto ingrandita con frecce */
     .headerHandle{
       width:100%;
-      height:20px;                       /* più alta */
-      background:rgba(0,0,0,.18);        /* un po' più visibile */
+      height:20px;
+      background:rgba(0,0,0,.18);
       cursor:pointer;
       display:flex;
       align-items:center;
@@ -45,7 +53,7 @@
       position:relative;
     }
     .headerHandle::before{
-      content:"▲ ▼";                     /* frecce su/giù */
+      content:"▲ ▼";
       font-size:11px;
       letter-spacing:3px;
       color:#f5f5f5;
@@ -80,7 +88,17 @@
       font-size:12px; border:1px solid rgba(0,0,0,.2); border-bottom-width:2px;
       padding:1px 6px; border-radius:6px; background:#fafafa;
     }
-    .status{ font-size:13px; opacity:.9; white-space:nowrap; }
+    .status{
+      font-size:13px;
+      opacity:.9;
+      white-space:nowrap;
+      flex:1 1 60%;
+      order:90;
+      margin-top:4px;
+      padding:4px 8px;
+      border-radius:6px;
+      background:#e5e5e5;
+    }
 
     .textControls{
       display:flex;
@@ -88,6 +106,11 @@
       gap:6px;
       font-size:13px;
       white-space:nowrap;
+      flex: 0 0 auto;
+      order: 90;
+      justify-content:flex-end;
+      margin-top:4px;
+      margin-left:auto;
     }
     .textControls input[type="color"]{
       width:26px;
@@ -210,6 +233,8 @@
       position:absolute; inset:0; pointer-events:none;
       display:flex; align-items:center; justify-content:center;
       font-size:14px; opacity:.55;
+      text-align:center;
+      padding:8px;
     }
 
     /* Controlli flottanti in basso a destra/sinistra */
@@ -263,7 +288,7 @@
     }
 
     /* Nascondo i bottoni originali nel header,
-       ma li tengo nel DOM per riusare tutta la logica JS */
+       ma li tengo nel DOM per riusare la logica JS */
     #btnZoomIn,
     #btnZoomOut,
     #btnPan,
@@ -295,13 +320,9 @@
       }
     }
 
-    #mapTitle {
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      user-select: none;
-      margin-left:auto;
-    }
+    #mapTitle { font-weight:800; letter-spacing:2px; user-select:none; margin-left:6px; flex:0 0 auto; }
+    #mapTitle .mapWord { font-size:16px; }
+    #mapTitle .mentalWord { font-size:22px; }
 
     .homeLogo{
       margin-left: 10px;
@@ -350,100 +371,138 @@
     .modal .row{ display:flex; gap:12px; flex-wrap:wrap; margin:10px 0; }
     .modal label{ display:flex; gap:8px; align-items:center; font-size:14px; cursor:pointer; }
     .modal .actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:12px; }
-  
-    /* Pulsante doppio Salva rapido / Opzioni salvataggio */
-    .saveSplit{
+
+    /* Pulsante triplo Salva rapido / Opzioni salvataggio / Importa */
+    .tripleSplit{
       display:inline-flex;
-      flex-direction:column;
+      flex-direction:row;
       margin:0 6px;
     }
-    .saveSplit .btn{
+    .tripleSplit .btn{
       padding:4px 10px;
       font-size:12px;
       border-radius:0;
     }
-    .saveSplit .btn.saveTop{
-      border-radius:10px 10px 0 0;
-      border-bottom-width:0;
+    .tripleSplit .btn.tripleLeft{
+      border-radius:10px 0 0 10px;
     }
-    .saveSplit .btn.saveBottom{
-      border-radius:0 0 10px 10px;
+    .tripleSplit .btn.tripleCenter{
+      border-radius:0;
+      border-left:1px solid rgba(0,0,0,.18);
+      border-right:1px solid rgba(0,0,0,.18);
+    }
+    .tripleSplit .btn.tripleRight{
+      border-radius:0 10px 10px 0;
+      border-left:1px solid rgba(0,0,0,.18);
     }
 
     /* Ottimizzazioni base per schermi piccoli */
     @media (max-width: 768px) {
-      #mapTitle {
-        font-size: 16px;
-        letter-spacing: 1px;
-      }
-      .status {
-        display:none;
-      }
-      .textControls {
-        display:none;
-      }
       .headerInner {
         padding:6px 8px;
+        flex-wrap:wrap;
       }
+
+      #mapTitle {
+        font-size:20px;
+        font-weight:800;
+        letter-spacing:2px;
+        user-select:none;
+        margin-left:6px;
+        flex:1 1 100%;
+      }
+
+      .status{
+        font-size:13px;
+        opacity:.9;
+        white-space:normal;
+        flex:1 1 100%;
+        order:90;
+        margin-top:4px;
+        padding:4px 8px;
+        border-radius:6px;
+        background:#e5e5e5;
+      }
+
+      .textControls {
+        display:flex;
+        flex-wrap:wrap;
+        gap:6px;
+        flex:1 1 100%;
+        justify-content:flex-start;
+        margin-top:4px;
+      }
+
       .btn {
         font-size:12px;
         padding:5px 7px;
+        white-space:nowrap;
       }
+
       .pop {
         max-width: 28ch;
       }
     }
-</style>
+  </style>
 </head>
 
 <body>
 <div id="app">
-    
+
   <header id="mainHeader">
     <div class="headerInner">
-      <button class="btn" id="btnNew">+ Nuovo pop</button>
-      <button class="btn" id="btnMove">Sposta</button>
-      <button class="btn" id="btnLink">Collega</button>
-      <button class="btn danger" id="btnDelete">Elimina</button>
-
-      <button class="btn" id="btnPdf">Stampa in PDF</button>
-
-      <!-- Pulsante doppio -->
-      <div class="saveSplit">
-        <button class="btn saveTop" id="btnQuickSave">
-          <span>Salva rapido</span>
-        </button>
-        <button class="btn saveBottom" id="btnSaveOptions">
-          <span>Opzioni salvataggio</span>
-        </button>
-      </div>
-
-      <button class="btn" id="btnImport">Importa HTML/JSON</button>
-      <input id="fileInput" type="file" accept=".json,.html" style="display:none" />
-
-      <button class="btn tiny" id="btnZoomIn">+</button>
-      <button class="btn tiny" id="btnZoomOut">-</button>
-      <button class="btn tiny" id="btnPan" title="Pan vista">
-        <span aria-hidden="true">✋</span>
-      </button>
-      <button class="btn tiny" id="btnKeyboardHelp">Comandi da tastiera</button>
-
-      <div class="textControls">
-        <span>Testo:</span>
-        <input type="color" id="txtColor" value="#000000" disabled>
-        <button class="btn tiny" id="btnSizeSmall" disabled>A-</button>
-        <button class="btn tiny" id="btnSizeLarge" disabled>A+</button>
-        <button class="btn tiny" id="btnBold" disabled><b>B</b></button>
-      </div>
-
-      <span class="status" id="status">Avvio...</span>
-      <span id="mapTitle">MAPPA MENTALE</span>
-
-      <a class="homeLogo"
+      <!-- Logo prima -->
+      <a
+         class="homeLogo"
          href="https://sptzetaevi.github.io/antimappificio/"
          title="Torna alla pagina principale ANTIMAPPIFICIO">
         <span class="logoLetters">A&nbsp;M</span>
       </a>
+
+      <!-- Titolo subito dopo il logo -->
+      <span id="mapTitle"><span class="mapWord">MAPPA</span> <span class="mentalWord">MENTALE</span></span>
+
+      <!-- Tutti gli altri tasti -->
+      <div class="rightButtons">
+        <button class="btn" id="btnNew" >+ Nuovo pop</button>
+        <button class="btn" id="btnMove">Sposta</button>
+        <button class="btn" id="btnLink">Collega</button>
+        <button class="btn danger" id="btnDelete">Elimina</button>
+
+        <button class="btn" id="btnPdf">Stampa in PDF</button>
+
+        <!-- Pulsante triplo compatto orizzontale: Salva rapido / Opzioni salvataggio / Importa -->
+        <div class="tripleSplit">
+          <button class="btn tripleLeft" id="btnQuickSave">
+            <span>Salva</span>
+          </button>
+          <button class="btn tripleCenter" id="btnSaveOptions">
+            <span>Salva con nome</span>
+          </button>
+          <button class="btn tripleRight" id="btnImport">
+            <span>Apri…</span>
+          </button>
+        </div>
+
+        <input id="fileInput" type="file" accept=".json,.html" style="display:none" />
+
+        <button class="btn tiny" id="btnZoomIn">+</button>
+        <button class="btn tiny" id="btnZoomOut">-</button>
+        <button class="btn tiny" id="btnPan" title="Pan vista">
+          <span aria-hidden="true">✋</span>
+        </button>
+        <button class="btn tiny" id="btnKeyboardHelp">Info e comandi</button>
+      </div>
+
+      <span class="status" id="status">Avvio...</span>
+
+      <div class="textControls">
+        <span>Formato:</span>
+        <input type="color" id="txtColor" value="#000000" disabled>
+        <button class="btn tiny" id="btnSizeSmall" disabled>-</button>
+        <button class="btn tiny" id="btnSizeLarge" disabled>+</button>
+        <button class="btn tiny" id="btnBold" disabled><b>B</b></button>
+      </div>
     </div>
 
     <div class="headerHandle" id="headerHandle" title="Mostra/nascondi strumenti"></div>
@@ -455,15 +514,15 @@
       <div id="world"></div>
     </div>
 
-    <div class="ghost">Doppio click sullo sfondo per creare un pop</div>
+    <div class="ghost">Doppio click (o doppio tap) sullo sfondo per creare un pop</div>
   </div>
 
-  <!-- BOX COMANDI DA TASTIERA -->
+  <!-- BOX Info e comandi -->
   <div class="modalOverlay" id="kbdOverlay">
     <div class="modal">
-      <h3>Comandi da tastiera</h3>
+      <h3>Info e comandi</h3>
       <p style="font-size:14px; line-height:1.4; margin:6px 0 10px;">
-        Doppio click = crea box • Trascina sfondo in modalità Pan = sposta vista • click linea = seleziona (per eliminare) •
+        Doppio click / doppio tap = crea box • Trascina sfondo in modalità Pan = sposta vista • click linea = seleziona (per eliminare) •
         doppio click linea = modifica • <kbd>CANC</kbd>/Elimina = elimina • <kbd>ESC</kbd> = annulla collega
       </p>
       <div class="actions">
@@ -479,11 +538,11 @@
       <div class="row">
         <label>
           <input type="radio" name="saveFormat" value="json" checked>
-          JSON (dati della mappa)
+          JSON (salva un file che potrai re-importare per modificare)
         </label>
         <label>
           <input type="radio" name="saveFormat" value="html">
-          HTML (pagina con file incorporato)
+          HTML (salva un file che potrai re-importare ma anche aprire con il tuo browser - es.firefox, edge, chrome ecc..)
         </label>
       </div>
       <div class="row">
@@ -499,6 +558,29 @@
       <div class="actions">
         <button class="btn tiny" id="btnSaveCancel">Annulla</button>
         <button class="btn tiny" id="btnSaveConfirm">Salva</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANNELLO OPZIONI STAMPA -->
+  <div class="modalOverlay" id="printOverlay">
+    <div class="modal">
+      <h3>Stampa mappa</h3>
+      <p style="font-size:14px; line-height:1.4; margin:6px 0 10px;">
+        Verrà stampata solo la <b>mappa mentale</b> visualizzata a schermo.<br>
+        Se l'impaginazione <b>non è corretta</b>, annullare la stampa e <b>usare i tasti in basso a destra</b> (+; -; pan) per centrare la mappa <b>nello schermo</b> prima di riprovare.
+        <br><br>
+        La stampa in PDF produce un file che viene salvato sul PC. Controllare di aver impostato come stampante "Salva come PDF" e non una stampante fisica (es. EPSON ecc.).
+      </p>
+      <div class="row">
+        <label style="font-size:14px;">
+          <input type="radio" name="printScope" value="map" checked>
+          Stampa mappa mentale
+        </label>
+      </div>
+      <div class="actions">
+        <button class="btn tiny" id="btnPrintCancel">Annulla</button>
+        <button class="btn tiny" id="btnPrintConfirm">Vai alla stampa</button>
       </div>
     </div>
   </div>
@@ -540,8 +622,6 @@
   var btnLink = document.getElementById("btnLink");
   var btnDelete = document.getElementById("btnDelete");
   var btnPdf = document.getElementById("btnPdf");
-  var btnExportJson = document.getElementById("btnExportJson");
-  var btnExportHtml = document.getElementById("btnExportHtml");
   var btnImport = document.getElementById("btnImport");
   var btnMove = document.getElementById("btnMove");
   var btnPan = document.getElementById("btnPan");
@@ -567,6 +647,10 @@
   var saveFileNameInp = document.getElementById("saveFileName");
   var btnSaveCancel   = document.getElementById("btnSaveCancel");
   var btnSaveConfirm  = document.getElementById("btnSaveConfirm");
+  // Pannello stampa
+  var printOverlay   = document.getElementById("printOverlay");
+  var btnPrintCancel = document.getElementById("btnPrintCancel");
+  var btnPrintConfirm= document.getElementById("btnPrintConfirm");
 
   // stato ultimo salvataggio
   var lastSaveBaseName = "";
@@ -581,9 +665,10 @@
   function uid(){ return Math.random().toString(36).slice(2, 10); }
   function boardRect(){ return board.getBoundingClientRect(); }
 
-  var pops = [];   // {id,x,y,text,color,size,bold,height}
+  var pops = [];   // {id,x,y,text,color,size,borderColor,borderSize,bold,height}
   var links = [];  // {id,from,to,end,shape,curveDir}
   var selectedBoxId = null;
+  var selectedBoxPart = null; // "text" o "border"
   var selectedLinkId = null;
   var linkingFrom = null;
   var moveMode = false;
@@ -694,6 +779,31 @@
     pinchState = null;
   });
 
+  // Doppio tap su dispositivi touch (es. iPhone) per creare un pop
+  var lastTap = { time: 0, x: 0, y: 0 };
+  board.addEventListener("pointerup", function(e){
+    if (e.pointerType !== "touch") return;
+    if (panMode || moveMode) return;
+    if (e.target.closest(".pop")) return;
+
+    var now = Date.now();
+    var dt = now - lastTap.time;
+    var dx = e.clientX - lastTap.x;
+    var dy = e.clientY - lastTap.y;
+    var dist2 = dx*dx + dy*dy;
+
+    if (dt < 350 && dist2 < (40*40)) {
+      var p = screenToWorld(e.clientX, e.clientY);
+      var pos = clampToBoard(p.x, p.y);
+      createPop(pos.x, pos.y);
+      lastTap.time = 0;
+    } else {
+      lastTap.time = now;
+      lastTap.x = e.clientX;
+      lastTap.y = e.clientY;
+    }
+  });
+
   board.addEventListener("wheel", function(e){
     if (!e.ctrlKey) return;
     e.preventDefault();
@@ -712,7 +822,6 @@
     applyView();
     renderLinks();
   }, { passive:false });
-
 
   function zoomAroundCenter(factor){
     var br = board.getBoundingClientRect();
@@ -832,7 +941,7 @@
       done(true);
     };
 
-    cancelBtn.onclick = function () {
+  cancelBtn.onclick = function () {
       close();
       done(false);
     };
@@ -845,9 +954,8 @@
     };
   }
 
+  // NESSUN vincolo sui bordi: spazio di lavoro libero
   function clampToBoard(x, y) {
-    if (x < 0) x = 0;
-    if (y < 0) y = 0;
     return { x:x, y:y };
   }
 
@@ -862,14 +970,14 @@
     btnBold.classList.remove("active");
   }
 
-  function enableTextControlsForPop(p) {
+  function enableTextControlsForText(p) {
     txtColor.disabled = false;
     btnSizeSmall.disabled = false;
     btnSizeLarge.disabled = false;
     btnBold.disabled = false;
 
     if (!p.color) p.color = "#000000";
-    if (!p.size) p.size = "small";
+    if (!p.size) p.size = "medium";
     if (typeof p.bold === "undefined") p.bold = false;
 
     txtColor.value = p.color;
@@ -879,21 +987,70 @@
     btnBold.classList.toggle("active", !!p.bold);
   }
 
+  function enableTextControlsForBorder(p) {
+    txtColor.disabled = false;
+    btnSizeSmall.disabled = false;
+    btnSizeLarge.disabled = false;
+    btnBold.disabled = true;
+
+    if (!p.borderColor) p.borderColor = p.color || "#000000";
+    if (!p.borderSize) p.borderSize = "thin";
+
+    txtColor.value = p.borderColor;
+
+    btnSizeSmall.classList.remove("active");
+    btnSizeLarge.classList.remove("active");
+    if (p.borderSize === "thin") {
+      btnSizeSmall.classList.add("active");
+    } else if (p.borderSize === "thick") {
+      btnSizeLarge.classList.add("active");
+    }
+  }
+
+  function enableTextControlsForLink(l) {
+    txtColor.disabled = false;
+    btnSizeSmall.disabled = true;
+    btnSizeLarge.disabled = true;
+    btnBold.disabled = true;
+
+    btnSizeSmall.classList.remove("active");
+    btnSizeLarge.classList.remove("active");
+    btnBold.classList.remove("active");
+
+    txtColor.value = l.color || "#000000";
+  }
+
   function updateTextControls() {
-    if (!selectedBoxId) {
-      disableTextControls();
+    if (selectedBoxId) {
+      var p = pops.find(function(pp){ return pp.id === selectedBoxId; });
+      if (!p) {
+        disableTextControls();
+        return;
+      }
+      if (selectedBoxPart === "border") {
+        enableTextControlsForBorder(p);
+      } else {
+        enableTextControlsForText(p);
+      }
       return;
     }
-    var p = pops.find(function(pp){ return pp.id === selectedBoxId; });
-    if (!p) {
-      disableTextControls();
+
+    if (selectedLinkId) {
+      var l = links.find(function(ll){ return ll.id === selectedLinkId; });
+      if (!l) {
+        disableTextControls();
+        return;
+      }
+      enableTextControlsForLink(l);
       return;
     }
-    enableTextControlsForPop(p);
+
+    disableTextControls();
   }
 
   function clearSelections() {
     selectedBoxId = null;
+    selectedBoxPart = null;
     selectedLinkId = null;
     var a = document.querySelectorAll(".pop");
     for (var i=0;i<a.length;i++) a[i].classList.remove("selected");
@@ -917,6 +1074,7 @@
   function selectLink(id) {
     selectedLinkId = id;
     selectedBoxId = null;
+    selectedBoxPart = null;
     var a = document.querySelectorAll(".linkLine");
     for (var i=0;i<a.length;i++) {
       a[i].classList.toggle("selected", a[i].dataset.linkid === id);
@@ -935,7 +1093,7 @@
     } else {
       btnPan.classList.remove("active");
       if (btnPan_f) btnPan_f.classList.remove("active");
-      setStatus("Pronto");
+      setStatus("Pensa ad un argomento e scrivigli intorno tutto quello che ti viene in mente");
     }
   }
 
@@ -965,10 +1123,10 @@
       btnLink.classList.remove("active");
       var b = document.querySelectorAll(".pop");
       for (var j=0;j<b.length;j++) b[j].classList.remove("linking");
-      setStatus("Pronto");
+      setStatus("Pensa ad un argomento e scrivigli intorno tutto quello che ti viene in mente");
     }
   }
-      
+
   function setMoveMode(on) {
     moveMode = !!on;
 
@@ -981,7 +1139,7 @@
     } else {
       btnMove.classList.remove("active");
       if (btnMove_f) btnMove_f.classList.remove("active");
-      setStatus("Pronto");
+      setStatus("Pensa ad un argomento e scrivigli intorno tutto quello che ti viene in mente");
     }
 
     var tas = document.querySelectorAll(".pop .body");
@@ -989,7 +1147,7 @@
       tas[i].readOnly = moveMode;
     }
   }
-  
+
   function autoGrow(ta, popModel) {
     ta.style.height = "auto";
 
@@ -1019,7 +1177,7 @@
 
     ta.style.height = needed + "px";
   }
-  
+
   function resizeSelectedTextarea() {
     if (!selectedBoxId) return;
     var p = pops.find(function(pp){ return pp.id === selectedBoxId; });
@@ -1037,7 +1195,9 @@
       y: y,
       text: "",
       color: "#000000",
-      size: "small",
+      borderColor: "#000000",
+      size: "medium",
+      borderSize: "thin",
       bold: false,
       height: 0,
       bigIntro: isFirst
@@ -1049,7 +1209,7 @@
     selectBox(p.id);
 
     setStatus(
-      "Suggerimento: scrivi un concetto chiave senza articoli o aggettivi (es. SI: Napoleone — NO: il grande Napoleone)."
+      "Pensa ad un argomento e scrivigli intorno tutto quello che ti viene in mente"
     );
 
     var el = document.querySelector('.pop[data-id="' + p.id + '"] .body');
@@ -1146,9 +1306,11 @@
       var end = l.end || "arrow";
       var shape = l.shape || "straight";
 
-      var color = "#000000";
-      var toPop = pops.find(function(pp){ return pp.id === l.to; });
-      if (toPop && toPop.color) color = toPop.color;
+      var color = l.color || "#000000";
+      if (!l.color) {
+        var toPop = pops.find(function(pp){ return pp.id === l.to; });
+        if (toPop && toPop.color) color = toPop.color;
+      }
 
       var elWire;
 
@@ -1233,7 +1395,7 @@
 
     pops.forEach(function (p, idx) {
       if (!p.color) p.color = "#000000";
-      if (!p.size) p.size = "small";
+      if (!p.size) p.size = "medium";
       if (typeof p.bold === "undefined") p.bold = false;
 
       var el = document.createElement("div");
@@ -1246,19 +1408,43 @@
 
       var placeholderAttr = "";
       if (idx === 0) {
-        placeholderAttr = ' placeholder="Inserisci qui l&#39;argomento della mappa"';
+        placeholderAttr = ' placeholder="Scrivi qui l&#39;argomento a cui stai pensando e di cui vuoi fare una mappa."';
+      } else {
+        placeholderAttr = ' placeholder=""';
       }
 
       el.innerHTML =
         '<textarea class="body" spellcheck="false" rows="1" cols="6"' + placeholderAttr + '></textarea>';
 
       var ta = el.querySelector(".body");
+
       ta.value = p.text || "";
 
-      var fontSizePx = (p.size === "large") ? "20px" : "14px";
+      var textSizeKey = p.size || "medium";
+      var fontSizePx;
+      if (textSizeKey === "small") {
+        fontSizePx = "14px";
+      } else if (textSizeKey === "large") {
+        fontSizePx = "22px";
+      } else {
+        fontSizePx = "18px";
+      }
+
+      var borderSizeKey = p.borderSize || "thin";
+      var borderWidth;
+      if (borderSizeKey === "thin") {
+        borderWidth = 1;
+      } else if (borderSizeKey === "thick") {
+        borderWidth = 3;
+      } else {
+        borderWidth = 2;
+      }
+
       ta.style.fontSize = fontSizePx;
       ta.style.fontWeight = p.bold ? "700" : "400";
       ta.style.color = p.color || "#000000";
+      el.style.borderWidth = borderWidth + "px";
+      el.style.borderColor = p.borderColor || "#000000";
 
       if (typeof p.height === "number" && p.height > 0) {
         ta.style.height = p.height + "px";
@@ -1270,10 +1456,10 @@
       if (p.id === linkingFrom) el.classList.add("linking");
 
       ta.addEventListener("focus", function () {
+        selectedBoxPart = "text";
         selectBox(p.id);
 
-        /* SU SMARTPHONE: chiudo l'header per liberare spazio
-           e porto il box al centro dello schermo */
+        // Su smartphone, chiudo l'header e porto il box al centro
         if (window.innerWidth <= 768) {
           headerCollapsed = true;
           header.classList.add("collapsed");
@@ -1286,6 +1472,7 @@
       });
 
       ta.addEventListener("mousedown", function (e) {
+        selectedBoxPart = "text";
         selectBox(p.id);
         if (linkingFrom && linkingFrom !== p.id) e.preventDefault();
       });
@@ -1294,11 +1481,6 @@
         p.text = e.target.value;
         autoGrow(ta, p);
         renderLinks();
-      });
-
-      ta.addEventListener("blur", function(){
-        /* opzionale: non riapro l'header automaticamente
-           per non creare movimento continuo; puoi riabilitare se preferisci */
       });
 
       el.addEventListener("click", function () {
@@ -1313,6 +1495,7 @@
       var dragging = false, sx=0, sy=0, ox=0, oy=0;
 
       el.addEventListener("pointerdown", function (e) {
+        if (e.target && e.target.classList && e.target.classList.contains("body")) selectedBoxPart = "text"; else selectedBoxPart = "border";
         if (e.pointerType === "mouse" && e.button !== 0) return;
         if (!moveMode && e.target && e.target.tagName && e.target.tagName.toLowerCase() === "textarea") return;
 
@@ -1422,7 +1605,7 @@
     downloadBlob(filename, blob);
     setStatus("Esportato HTML (" + filename + ").");
   }
-  
+
   function parseImportedText(text) {
     var t = (text || "").trim();
 
@@ -1458,7 +1641,7 @@
     if (e.target === board) {
       clearSelections();
       setLinkMode(false);
-      setStatus("Pronto");
+      setStatus("Pensa ad un argomento e scrivigli intorno tutto quello che ti viene in mente");
     }
   });
 
@@ -1496,7 +1679,13 @@
     setPanMode(newOn);
   });
 
-  btnPdf.addEventListener("click", exportPDF);
+  btnPdf.addEventListener("click", function(){
+    if (printOverlay) {
+      printOverlay.style.display = "flex";
+    } else {
+      exportPDF();
+    }
+  });
   btnImport.addEventListener("click", doImport);
   btnZoomIn.addEventListener("click", function(){ zoomAroundCenter(1.15); });
   btnZoomOut.addEventListener("click", function(){ zoomAroundCenter(1/1.15); });
@@ -1548,6 +1737,19 @@
     });
   }
 
+  // Gestione pannello stampa
+  if (btnPrintCancel && printOverlay) {
+    btnPrintCancel.addEventListener("click", function(){
+      printOverlay.style.display = "none";
+    });
+  }
+  if (btnPrintConfirm && printOverlay) {
+    btnPrintConfirm.addEventListener("click", function(){
+      printOverlay.style.display = "none";
+      exportPDF();
+    });
+  }
+
   if (btnSaveConfirm) {
     btnSaveConfirm.addEventListener("click", function(){
       if (!saveOverlay) return;
@@ -1582,7 +1784,7 @@
       if (lastSaveBaseName) {
         exportJSON(lastSaveBaseName);
       } else {
-        exportJSON(null);  // nome con timestamp, come prima
+        exportJSON(null);  // nome con timestamp
       }
     });
   }
@@ -1619,16 +1821,32 @@
   }
 
   txtColor.addEventListener("input", function(){
+    var newColor = txtColor.value || "#000000";
+
+    // Se è selezionato un collegamento, cambia colore alla freccia
+    if (selectedLinkId && !selectedBoxId) {
+      var l = links.find(function(ll){ return ll.id === selectedLinkId; });
+      if (l) {
+        l.color = newColor;
+        renderLinks();
+      }
+      return;
+    }
+
+    // Se è selezionato un box, controlla se stai lavorando su testo o bordo
     if (!selectedBoxId) return;
     var p = pops.find(function(pp){ return pp.id === selectedBoxId; });
     if (!p) return;
-    p.color = txtColor.value || "#000000";
 
-    var ta = document.querySelector('.pop[data-id="'+p.id+'"] .body');
-    if (ta) ta.style.color = p.color;
-
-    var boxEl = document.querySelector('.pop[data-id="'+p.id+'"]');
-    if (boxEl) boxEl.style.borderColor = p.color;
+    if (selectedBoxPart === "text") {
+      p.color = newColor;
+      var ta = document.querySelector('.pop[data-id="'+p.id+'"] .body');
+      if (ta) ta.style.color = p.color;
+    } else {
+      p.borderColor = newColor;
+      var boxEl = document.querySelector('.pop[data-id="'+p.id+'"]');
+      if (boxEl) boxEl.style.borderColor = p.borderColor;
+    }
 
     renderLinks();
   });
@@ -1637,12 +1855,26 @@
     if (!selectedBoxId) return;
     var p = pops.find(function(pp){ return pp.id === selectedBoxId; });
     if (!p) return;
-    p.size = "small";
+
+    if (selectedBoxPart === "border") {
+      // scala bordo verso il più sottile: thick -> medium -> thin
+      var current = p.borderSize || "thin";
+      if (current === "thick") current = "medium";
+      else current = "thin";
+      p.borderSize = current;
+    } else {
+      // scala testo verso il più piccolo: large -> medium -> small
+      var current = p.size || "medium";
+      if (current === "large") current = "medium";
+      else current = "small";
+      p.size = current;
+    }
+
     var ta = document.querySelector('.pop[data-id="'+p.id+'"] .body');
     if (ta) {
-      ta.style.fontSize = "14px";
       autoGrow(ta, p);
     }
+    render();
     updateTextControls();
   });
 
@@ -1650,12 +1882,26 @@
     if (!selectedBoxId) return;
     var p = pops.find(function(pp){ return pp.id === selectedBoxId; });
     if (!p) return;
-    p.size = "large";
+
+    if (selectedBoxPart === "border") {
+      // scala bordo verso il più spesso: thin -> medium -> thick
+      var current = p.borderSize || "thin";
+      if (current === "thin") current = "medium";
+      else current = "thick";
+      p.borderSize = current;
+    } else {
+      // scala testo verso il più grande: small -> medium -> large
+      var current = p.size || "medium";
+      if (current === "small") current = "medium";
+      else current = "large";
+      p.size = current;
+    }
+
     var ta = document.querySelector('.pop[data-id="'+p.id+'"] .body');
     if (ta) {
-      ta.style.fontSize = "20px";
       autoGrow(ta, p);
     }
+    render();
     updateTextControls();
   });
 
@@ -1703,7 +1949,7 @@
   });
 
   render();
-  setStatus("Pronto");
+  setStatus("Pensa ad un argomento e scrivigli intorno tutto quello che ti viene in mente");
 
   /* --- ADATTAMENTO CONTROLLI FLOTTANTI CON TASTIERA MOBILE --- */
   if (window.visualViewport) {
